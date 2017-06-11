@@ -9,7 +9,7 @@
 export default {}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../common/scss/mixin';
 
 .head-top {
@@ -21,7 +21,7 @@ export default {}
     .head-icon {
         display: inline-block;
         vertical-align: top;
-        @include bg-image('logo');
+        @include bg-image( 'logo');
         background-size: 30px 32px;
         margin-right: 9px;
         width: 30px;
@@ -29,10 +29,10 @@ export default {}
         margin-top: 6px;
     }
     .head-text {
-      display: inline-block;
-      vertical-align: top;
-      line-height: 44px;
-      font-size: 18px;
+        display: inline-block;
+        vertical-align: top;
+        line-height: 44px;
+        font-size: 18px;
     }
 }
 </style>
