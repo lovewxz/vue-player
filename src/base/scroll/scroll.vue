@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="scroll-wrapper" ref="wrapper">
+  <div ref="wrapper">
     <slot></slot>
   </div>
 </template>
@@ -43,7 +43,9 @@ export default {
   },
   watch: {
     data() {
-      this.refresh()
+      setTimeout(() => {
+        this.refresh()
+      }, 20)
     }
   },
   mounted() {
