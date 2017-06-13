@@ -6,7 +6,7 @@
           <slider>
             <div v-for="item in recommends">
               <a :href="item.linkUrl">
-                <img :src="item.picUrl" @load="loadImage">
+                <img :src="item.picUrl" @load="loadImage" class="needClick">
               </a>
             </div>
           </slider>
@@ -66,7 +66,6 @@ export default {
     },
     _getDiscList() {
       getDiscList().then((res) => {
-        console.log(res)
         if (res.code === ERR_OK) {
           this.discList = res.data.list
         }
@@ -88,5 +87,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../components/Recommend/Recommend.scss';
+@import '../../components/Recommend/Recommend';
 </style>
