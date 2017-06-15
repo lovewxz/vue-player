@@ -55,6 +55,24 @@
       line-height: 1;
       color: $color-text-l;
       font-size: 12px;
+      &.current {
+        color: $color-theme
+      }
+    }
+  }
+
+  .list-fixed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    .list-fixed-title {
+      height: 30px;
+      line-height: 30px;
+      padding-left: 20px;
+      font-size: 12px;
+      color: $color-text-l;
+      background: $color-background-d;
     }
   }
 }
