@@ -1,6 +1,16 @@
 .singer {
-    position: fixed;
-    top: 88px;
-    bottom: 0;
-    width: 100%;
+  position: fixed;
+  top: 88px;
+  bottom: 0;
+  width: 100%;
+
+  .moveInLeft-enter-active,
+  .moveInLeft-leave-active {
+    transition: all 0.3s linear;
+  }
+
+  .moveIn-leave-to,
+  .moveInLeft-enter {
+    transform: translate3d(100%,0,0);
+  }
 }

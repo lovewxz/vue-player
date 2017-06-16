@@ -4,7 +4,7 @@
     <li class="list-group" v-for="group in data" ref="listgroup">
       <h2 class="list-group-title">{{group.title}}</h2>
       <ul>
-        <li class="list-group-item" v-for="(singer,index) in group.items" :key="index">
+        <li class="list-group-item" v-for="(singer,index) in group.items" :key="index" @click="selectItem(singer)">
           <img v-lazy="singer.avatar" :alt="singer.name" class="avatar">
           <span class="text">{{singer.name}}</span>
         </li>
@@ -21,11 +21,15 @@
   <div class="list-fixed" v-show="fixedTitle">
     <h2 class="list-fixed-title" ref="fixed">{{fixedTitle}}</h2>
   </div>
+  <div class="loading-wrapper" v-show="!data.length">
+    <loading></loading>
+  </div>
 </scroll>
 </template>
 
 <script>
 import Scroll from '@/base/scroll/scroll'
+import Loading from '@/base/loading/loading'
 import {
   getData
 } from '@/common/js/dom'
@@ -84,6 +88,9 @@ export default {
     },
     scroll(pos) {
       this.scrollY = pos.y
+    },
+    selectItem(item) {
+      this.$emit('select', item)
     },
     _scrollTo(index) {
       if (index !== 0 && !index) {
@@ -147,11 +154,12 @@ export default {
     }
   },
   components: {
-    Scroll
+    Scroll,
+    Loading
   }
 }
 </script>
 
 <style lang="scss">
-@import '../../base/listview/listview';
+@import 'listview';
 </style>

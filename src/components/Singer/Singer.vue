@@ -1,6 +1,9 @@
 <template lang="html">
   <div class="singer">
-    <listview :data="singerList"></listview>
+    <listview :data="singerList" @select="select"></listview>
+    <transition name="moveInLeft">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
@@ -27,6 +30,11 @@ export default {
     this._getSingerList()
   },
   methods: {
+    select(singer) {
+      this.$router.push({
+        path: `/singer/${singer.id}`
+      })
+    },
     _getSingerList() {
       getSingerList().then((res) => {
         if (res.code === ERR_OK) {
