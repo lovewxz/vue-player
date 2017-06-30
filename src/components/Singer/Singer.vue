@@ -16,6 +16,9 @@ import {
 import {
   ERR_OK
 } from '@/api/config'
+import {
+  mapMutations
+} from 'vuex'
 
 const HOST_NAME = '热门'
 const HOST_NAME_LENGTH = 10
@@ -34,6 +37,7 @@ export default {
       this.$router.push({
         path: `/singer/${singer.id}`
       })
+      this.setSinger(singer)
     },
     _getSingerList() {
       getSingerList().then((res) => {
@@ -84,7 +88,10 @@ export default {
         return a.title.charCodeAt(0) - b.title.charCodeAt(0)
       })
       return hot.concat(ret)
-    }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    })
   },
   components: {
     Listview
