@@ -1,21 +1,12 @@
 <template>
-  <music-list :songs="songs" :bg-img="bgImg" :title="title"></music-list>
+<music-list :songs="songs" :bg-img="bgImg" :title="title"></music-list>
 </template>
 
 <script>
-import {
-  mapGetters
-} from 'vuex'
-import {
-  getSingerDetail
-} from '@/api/singer'
-import {
-  ERR_OK
-} from '@/api/config'
-
-import {
-  createSong
-} from '@/common/js/song'
+import { mapGetters } from 'vuex'
+import { getSingerDetail } from '@/api/singer'
+import { ERR_OK } from '@/api/config'
+import { createSong } from '@/common/js/song'
 import MusicList from '@/components/MusicList/MusicList'
 
 export default {
@@ -54,9 +45,7 @@ export default {
     _normalizeSong(list) {
       let ret = []
       list.forEach(item => {
-        let {
-          musicData
-        } = item
+        let { musicData } = item
         if (musicData.songid && musicData.albummid) {
           ret.push(createSong(musicData))
         }

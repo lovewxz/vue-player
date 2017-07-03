@@ -1,14 +1,14 @@
 <template>
-  <div class="song-list">
-    <ul>
-      <li class="item" v-for="song in songs">
-        <div class="content">
-          <h2 class="name">{{song.name}}</h2>
-          <p class="desc">{{songDesc(song)}}</p>
-        </div>
-      </li>
-    </ul>
-  </div>
+<div class="song-list">
+  <ul>
+    <li class="item" v-for="(song,index) in songs" @click="selectItem(song,index)">
+      <div class="content">
+        <h2 class="name">{{song.name}}</h2>
+        <p class="desc">{{songDesc(song)}}</p>
+      </div>
+    </li>
+  </ul>
+</div>
 </template>
 <script>
 export default {
@@ -21,6 +21,9 @@ export default {
   methods: {
     songDesc(song) {
       return `${song.singer}·${song.album}`
+    },
+    selectItem(item, index) {
+      this.$emit('selectItem', item, index)
     }
   }
 }
@@ -28,30 +31,30 @@ export default {
 <style lang="scss" scoped>
 @import '../../common/scss/variable';
 .song-list {
-  .item {
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    height: 64px;
-    font-size: 14px;
-    .content {
-      flex: 1;
-      line-height: 20px;
-      overflow: hidden;
-      .name {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        color: $color-text;
-      }
-      .desc {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        margin-top: 4px;
-        color: $color-text-d;
-      }
+    .item {
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        height: 64px;
+        font-size: 14px;
+        .content {
+            flex: 1;
+            line-height: 20px;
+            overflow: hidden;
+            .name {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                color: $color-text;
+            }
+            .desc {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                margin-top: 4px;
+                color: $color-text-d;
+            }
+        }
     }
-  }
 }
 </style>

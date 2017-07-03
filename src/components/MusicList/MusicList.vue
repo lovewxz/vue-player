@@ -16,7 +16,7 @@
   <div class="layer" ref="layer"></div>
   <scroll class="list" :data="songs" ref="list" :listen-scroll="listenScroll" :probe-type="probeType" @scroll="scroll">
     <div class="song-list-wrapper">
-      <song-list :songs="songs"></song-list>
+      <song-list :songs="songs" @selectItem="selectItem"></song-list>
     </div>
     <div class="loading-wrapper">
       <loading></loading>
@@ -27,10 +27,10 @@
 <script>
 import Scroll from '@/base/scroll/scroll'
 import SongList from '@/base/song-list/song-list'
-import {
-  prefixStyle
-} from '@/common/js/dom'
+import { prefixStyle } from '@/common/js/dom'
 import Loading from '@/base/loading/loading'
+
+import { mapActions } from 'vuex'
 
 const TOP_HEIGHT = 40
 const transform = prefixStyle('transform')
@@ -67,7 +67,16 @@ export default {
     },
     back() {
       this.$router.back()
-    }
+    },
+    selectItem(item, index) {
+      this.selectPlay({
+        list: this.songs,
+        index
+      })
+    },
+    ...mapActions([
+      'selectPlay'
+    ])
   },
   created() {
     this.listenScroll = true
@@ -168,32 +177,32 @@ export default {
             background: rgba(7,17,27,.4);
         }
         .player-wrapper {
-          position: absolute;
-          bottom: 20px;
-          z-index: 50;
-          width: 100%;
-          .player {
-            box-sizing: border-box;
-            width: 135px;
-            padding: 7px 0;
-            margin: 0 auto;
-            text-align: center;
-            border: 1px solid $color-theme;
-            color: $color-theme;
-            border-radius: 100px;
-            font-size: 0;
-            .icon-play {
-              display: inline-block;
-              vertical-align: middle;
-              margin-right: 6px;
-              font-size: 16px;
+            position: absolute;
+            bottom: 20px;
+            z-index: 50;
+            width: 100%;
+            .player {
+                box-sizing: border-box;
+                width: 135px;
+                padding: 7px 0;
+                margin: 0 auto;
+                text-align: center;
+                border: 1px solid $color-theme;
+                color: $color-theme;
+                border-radius: 100px;
+                font-size: 0;
+                .icon-play {
+                    display: inline-block;
+                    vertical-align: middle;
+                    margin-right: 6px;
+                    font-size: 16px;
+                }
+                .text {
+                    display: inline-block;
+                    vertical-align: middle;
+                    font-size: 12px;
+                }
             }
-            .text {
-              display: inline-block;
-              vertical-align: middle;
-              font-size: 12px;
-            }
-          }
         }
     }
     .list {
