@@ -25,6 +25,13 @@
         </div>
       </div>
       <div class="bottom">
+        <div class="progress-wrapper">
+          <span class="time time-l">{{_filterTime(currentTime)}}</span>
+          <div class="progress-bar-wrapper">
+            <progress-bar :percent="percent" @progressOnChange="progressOnChange"></progress-bar>
+          </div>
+          <span class="time time-r">{{_filterTime(currentSong.duration)}}</span>
+        </div>
         <div class="operators">
           <div class="icon i-left">
             <i class="icon-sequence"></i>
@@ -55,30 +62,39 @@
         <p class="desc" v-html="currentSong.singer"></p>
       </div>
       <div class="control">
-        <i :class="miniPlayIcon" @click.stop="togglePlaying"></i>
+        <progress-circle :radius="radius" :percent="percent">
+          <i :class="miniPlayIcon" @click.stop="togglePlaying" class="icon-mini"></i>
+        </progress-circle>
       </div>
       <div class="control">
         <i class="icon-playlist"></i>
       </div>
     </div>
   </transition>
-  <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error"></audio>
+  <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="getAudioTime"></audio>
 </div>
 </template>
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from '@/common/js/dom'
+import progressBar from '@/base/progressBar/progressBar'
+import progressCircle from '@/base/progressCircle/progressCircle'
 
 const transform = prefixStyle('transform')
 
 export default {
   data() {
     return {
-      songReady: false
+      songReady: false,
+      currentTime: 0,
+      radius: 32
     }
   },
   computed: {
+    percent() {
+      return this.currentTime / this.currentSong.duration
+    },
     animateRotate() {
       return this.playing ? 'play' : 'play pause'
     },
@@ -100,6 +116,15 @@ export default {
     ])
   },
   methods: {
+    progressOnChange(percent) {
+      this.$refs.audio.currentTime = this.currentSong.duration * percent
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+    },
+    getAudioTime(e) {
+      this.currentTime = e.target.currentTime
+    },
     back() {
       this.setFullScreen(false)
     },
@@ -180,6 +205,20 @@ export default {
     error() {
       this.songReady = true
     },
+    _filterTime(time) {
+      time = Math.floor(time)
+      const minutes = Math.floor(time / 60)
+      const seconds = this._pad(time % 60)
+      return `${minutes}:${seconds}`
+    },
+    _pad(num, n = 2) {
+      let len = num.toString().length
+      while (len < n) {
+        num = '0' + num
+        len++
+      }
+      return num
+    },
     _getPosAndScale() {
       const targetWidth = 40
       const paddingLeft = 40
@@ -213,6 +252,10 @@ export default {
         newPlaying ? audioDom.play() : audioDom.pause()
       })
     }
+  },
+  components: {
+    progressBar,
+    progressCircle
   }
 }
 </script>
@@ -340,6 +383,28 @@ export default {
             position: absolute;
             bottom: 50px;
             width: 100%;
+            .progress-wrapper {
+                display: flex;
+                width: 80%;
+                margin: 0 auto;
+                padding: 10px 0;
+                .time {
+                    color: $color-text;
+                    font-size: 12px;
+                    flex: 0 0 30px;
+                    line-height: 30px;
+                    width: 30px;
+                    &.time-l {
+                        text-align: left;
+                    }
+                    &.time-r {
+                        text-align: right;
+                    }
+                }
+                .progress-bar-wrapper {
+                    flex: 1;
+                }
+            }
             .operators {
                 display: flex;
                 align-items: center;
@@ -348,7 +413,7 @@ export default {
                     flex: 1;
                     color: $color-theme;
                     &.disable {
-                      color: $color-theme-d;
+                        color: $color-theme-d;
                     }
                     i {
                         font-size: 30px;
