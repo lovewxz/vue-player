@@ -23,8 +23,19 @@
             <div class="playing-lyric"></div>
           </div>
         </div>
+        <scroll class="middle-r" :data="currentLyric && currentLyric.lines" ref="lyricWrapper">
+          <div class="lyric-wrapper">
+            <div v-if="currentLyric">
+              <p class="text" v-for="(line,index) in currentLyric.lines" ref="lyricline" :class="{current: currentLineNum === index}">{{line.txt}}</p>
+            </div>
+          </div>
+        </scroll>
       </div>
       <div class="bottom">
+        <div class="dot-wrapper">
+          <div class="dot" :class="{active: currentShow === 'cd'}"></div>
+          <div class="dot"></div>
+        </div>
         <div class="progress-wrapper">
           <span class="time time-l">{{_filterTime(currentTime)}}</span>
           <div class="progress-bar-wrapper">
@@ -82,6 +93,8 @@ import progressBar from '@/base/progressBar/progressBar'
 import progressCircle from '@/base/progressCircle/progressCircle'
 import { playMode } from '@/common/js/config'
 import { shuffle } from '@/common/js/util'
+import Lyric from 'lyric-parser'
+import Scroll from '@/base/scroll/scroll'
 
 const transform = prefixStyle('transform')
 
@@ -90,7 +103,10 @@ export default {
     return {
       songReady: false,
       currentTime: 0,
-      radius: 32
+      radius: 32,
+      currentLyric: null,
+      currentShow: 'cd',
+      currentLineNum: 0
     }
   },
   computed: {
@@ -270,6 +286,24 @@ export default {
         scale
       }
     },
+    _getLyric() {
+      this.currentSong.getLyric().then(res => {
+        this.currentLyric = new Lyric(res, this._handlerLyric)
+        console.log(this.currentLyric)
+        if (this.playing) {
+          this.currentLyric.play()
+        }
+      })
+    },
+    _handlerLyric({ lineNum, txt }) {
+      this.currentLineNum = lineNum
+      if (lineNum > 5) {
+        let lineEl = this.$refs.lyricline[lineNum - 5]
+        this.$refs.lyricWrapper.scrollToElement(lineEl, 1000)
+      } else {
+        this.$refs.lyricWrapper.scrollTo(0, 0, 1000)
+      }
+    },
     ...mapMutations({
       setFullScreen: 'SET_FULLSCREEN',
       setPlaying: 'SET_PLAYING',
@@ -285,6 +319,7 @@ export default {
       }
       this.$nextTick(() => {
         this.$refs.audio.play()
+        this._getLyric()
       })
     },
     playing(newPlaying) {
@@ -296,7 +331,8 @@ export default {
   },
   components: {
     progressBar,
-    progressCircle
+    progressCircle,
+    Scroll
   }
 }
 </script>
@@ -419,11 +455,48 @@ export default {
                     }
                 }
             }
+            .middle-r {
+                display: inline-block;
+                vertical-align: top;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                .lyric-wrapper {
+                    width: 80%;
+                    margin: 0 auto;
+                    overflow: hidden;
+                    text-align: center;
+                    .text {
+                        font-size: 14px;
+                        line-height: 32px;
+                        color: $color-text-l;
+                        &.current {
+                            color: $color-text-ll;
+                        }
+                    }
+                }
+            }
         }
         .bottom {
             position: absolute;
             bottom: 50px;
             width: 100%;
+            .dot-wrapper {
+                text-align: center;
+                .dot {
+                    display: inline-block;
+                    margin: 0 4px;
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: $color-text-l;
+                    &.active {
+                        width: 20px;
+                        border-radius: 5px;
+                        background: $color-text-ll;
+                    }
+                }
+            }
             .progress-wrapper {
                 display: flex;
                 width: 80%;
