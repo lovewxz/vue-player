@@ -20,7 +20,7 @@
             </div>
           </div>
           <div class="playing-lyric-wrapper">
-            <div class="playing-lyric"></div>
+            <div class="playing-lyric">{{playingLyric}}</div>
           </div>
         </div>
         <scroll class="middle-r" :data="currentLyric && currentLyric.lines" ref="lyricWrapper">
@@ -107,7 +107,8 @@ export default {
       radius: 32,
       currentLyric: null,
       currentShow: 'cd',
-      currentLineNum: 0
+      currentLineNum: 0,
+      playingLyric: ''
     }
   },
   computed: {
@@ -141,9 +142,13 @@ export default {
   },
   methods: {
     progressOnChange(percent) {
-      this.$refs.audio.currentTime = this.currentSong.duration * percent
+      const currentTime = this.currentSong.duration * percent
+      this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
         this.togglePlaying()
+      }
+      if (this.currentLyric) {
+        this.currentLyric.seek(currentTime * 1000)
       }
     },
     getAudioTime(e) {
@@ -194,6 +199,9 @@ export default {
     },
     togglePlaying() {
       this.setPlaying(!this.playing)
+      if (this.currentLyric) {
+        this.currentLyric.togglePlay()
+      }
     },
     end() {
       if (this.mode === playMode.loop) {
@@ -206,11 +214,15 @@ export default {
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex - 1
-      if (index === -1) {
-        index = this.playList.length - 1
+      if (this.playList.length === 1) {
+        this._loop()
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playList.length - 1
+        }
+        this.setCurrentIndex(index)
       }
-      this.setCurrentIndex(index)
       if (!this.playing) {
         this.togglePlaying()
       }
@@ -220,11 +232,15 @@ export default {
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex + 1
-      if (index === this.playList.length) {
-        index = 0
+      if (this.playList.length === 1) {
+        this._loop()
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playList.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
       }
-      this.setCurrentIndex(index)
       if (!this.playing) {
         this.togglePlaying()
       }
@@ -312,6 +328,10 @@ export default {
     _loop() {
       this.$refs.audio.currentTime = 0
       this.$refs.audio.play()
+      // 循环播放时，让歌词回到0
+      if (this.currentLyric) {
+        this.currentLyric.seek(0)
+      }
     },
     _resetCurrentIndex(list) {
       let index = list.findIndex((item) => {
@@ -355,6 +375,10 @@ export default {
         if (this.playing) {
           this.currentLyric.play()
         }
+      }).catch(() => {
+        this.currentLyric = null
+        this.playingLyric = ''
+        this.currentLineNum = 0
       })
     },
     _handlerLyric({ lineNum, txt }) {
@@ -365,6 +389,7 @@ export default {
       } else {
         this.$refs.lyricWrapper.scrollTo(0, 0, 1000)
       }
+      this.playingLyric = txt
     },
     ...mapMutations({
       setFullScreen: 'SET_FULLSCREEN',
@@ -382,10 +407,15 @@ export default {
       if (newSong.id === oldSong.id) {
         return
       }
-      this.$nextTick(() => {
+      // 歌词跳跃问题。是因为lyric-parser中有定时器，我们需要在歌曲改变的时候暂停歌词
+      if (this.currentLyric) {
+        this.currentLyric.stop()
+      }
+      // 为了兼容微信切换到后台时，返回后继续能播放
+      setTimeout(() => {
         this.$refs.audio.play()
         this._getLyric()
-      })
+      }, 1000)
     },
     playing(newPlaying) {
       this.$nextTick(() => {
@@ -517,6 +547,18 @@ export default {
                             height: 100%;
                             border-radius: 50%;
                         }
+                    }
+                }
+                .playing-lyric-wrapper {
+                    width: 80%;
+                    margin: 30px auto 0;
+                    overflow: hidden;
+                    text-align: center;
+                    .playing-lyric {
+                        height: 20px;
+                        line-height: 20px;
+                        font-size: 14px;
+                        color: $color-text-l;
                     }
                 }
             }

@@ -1,6 +1,6 @@
 <template lang="html">
-  <div class="singer">
-    <listview :data="singerList" @select="select"></listview>
+  <div class="singer" ref="singer">
+    <listview :data="singerList" @select="select" ref="list"></listview>
     <transition name="moveInLeft">
       <router-view></router-view>
     </transition>
@@ -10,20 +10,17 @@
 <script>
 import Singer from '@/common/js/singer'
 import Listview from '@/base/listview/listview'
-import {
-  getSingerList
-} from '@/api/singer'
-import {
-  ERR_OK
-} from '@/api/config'
-import {
-  mapMutations
-} from 'vuex'
+import { getSingerList } from '@/api/singer'
+import { ERR_OK } from '@/api/config'
+import { mapMutations } from 'vuex'
+import { playListMixin } from '@/common/js/mixin'
+import { miniPlayerHeight } from '@/common/js/config'
 
 const HOST_NAME = '热门'
 const HOST_NAME_LENGTH = 10
 
 export default {
+  mixins: [playListMixin],
   data() {
     return {
       singerList: []
@@ -33,6 +30,11 @@ export default {
     this._getSingerList()
   },
   methods: {
+    handlerPlayList(playlist) {
+      const bottom = playlist.length > 0 ? miniPlayerHeight : ''
+      this.$refs.singer.style.bottom = bottom
+      this.$refs.list.refresh()
+    },
     select(singer) {
       this.$router.push({
         path: `/singer/${singer.id}`
