@@ -11,3 +11,5 @@ export const SET_PLAY_LIST = 'SET_PLAY_LIST'
 export const SET_MODE = 'SET_MODE'
 
 export const SET_CURRENTINDEX = 'SET_CURRENTINDEX'
+
+export const SET_DISC = 'SET_DISC'

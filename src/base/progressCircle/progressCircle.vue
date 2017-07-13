@@ -46,7 +46,7 @@ export default {
             stroke: $color-theme-d;
         }
         &.progress-bar {
-            transform: scale(.9) rotate(-90deg);
+            transform: rotate(270deg) scale(.9);
             stroke: $color-theme;
         }
     }
