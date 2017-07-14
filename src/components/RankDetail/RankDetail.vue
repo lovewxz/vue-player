@@ -36,6 +36,9 @@ export default {
   },
   methods: {
     _getRankDetail(id) {
+      if (!id) {
+        this.$router.push('/rank')
+      }
       getRankDetail(id).then(res => {
         if (res.code === ERR_OK) {
           this.rankSongs = this._normalizelist(res.songlist)
