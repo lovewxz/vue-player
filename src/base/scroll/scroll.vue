@@ -27,6 +27,10 @@ export default {
     pullUp: {
       type: Boolean,
       default: false
+    },
+    beforeScroll: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -52,6 +56,13 @@ export default {
           if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
             me.$emit('scrollToEnd')
           }
+        })
+      }
+
+      if (this.beforeScroll) {
+        let me = this
+        this.scroll.on('beforeScrollStart', () => {
+          me.$emit('beforeScroll')
         })
       }
     },

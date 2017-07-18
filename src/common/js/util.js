@@ -12,3 +12,22 @@ export function shuffle(arr) {
   }
   return _arr
 }
+
+/**
+ * 截流函数
+ * @param  {[func]} func  [传入函数]
+ * @param  {[number]} delay [延迟时间]
+ * @return {[func]}
+ */
+export function debounce(func, delay) {
+  let timer
+  // 传入一个函数，返回一个函数就是函数的柯里化
+  return function (...args) {
+    if (timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(() => {
+      func.apply(this, args)
+    }, delay)
+  }
+}

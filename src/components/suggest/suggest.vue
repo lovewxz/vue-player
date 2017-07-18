@@ -1,8 +1,8 @@
 <template>
 <div class="suggest">
-  <scroll class="suggest-list" :data="searchResult" :pullUp="pullUp" @scrollToEnd="scrollToEnd" ref="scroll">
+  <scroll class="suggest-list" :data="searchResult" :pullUp="pullUp" :beforeScroll="beforeScroll" @scrollToEnd="scrollToEnd" ref="scroll" @beforeScroll="listScroll">
     <ul>
-      <li class="suggest-item" v-for="item in searchResult">
+      <li class="suggest-item" v-for="item in searchResult" @click="selectItem(item)">
         <div class="icon">
           <i :class="getIconCls(item)"></i>
         </div>
@@ -13,6 +13,12 @@
       <loading title="" v-show="hasMore"></loading>
     </ul>
   </scroll>
+  <div class="no-result-wrapper">
+    <no-result title="抱歉,无搜索结果" v-if="!hasMore && !searchResult.length"></no-result>
+  </div>
+  <transition name="moveInLeft">
+    <router-view></router-view>
+  </transition>
 </div>
 </template>
 <script>
@@ -21,6 +27,9 @@ import { ERR_OK } from '@/api/config'
 import { createSong } from '@/common/js/song'
 import Scroll from '@/base/scroll/scroll'
 import Loading from '@/base/loading/loading'
+import Singer from '@/common/js/singer'
+import { mapMutations, mapActions } from 'vuex'
+import NoResult from '@/base/no-result/no-result'
 
 const perpage = 20
 const TYPE_SINGER = 'singer'
@@ -34,6 +43,10 @@ export default {
     zhida: {
       type: Boolean,
       default: true
+    },
+    beforeScroll: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -45,6 +58,22 @@ export default {
     }
   },
   methods: {
+    listScroll() {
+      this.$emit('listScroll')
+    },
+    selectItem(item) {
+      if (item.type === TYPE_SINGER) {
+        const singer = new Singer({
+          id: item.singermid,
+          name: item.singername
+        })
+        this.$router.push(`/search/${singer.id}`)
+        this.setSinger(singer)
+      } else {
+        this.insertSong(item)
+      }
+      this.$emit('select', item)
+    },
     scrollToEnd() {
       if (!this.hasMore) {
         return
@@ -85,7 +114,7 @@ export default {
     },
     _checkMore(data) {
       const song = data.song
-      if (!song.list.length && (song.curnum + song.curpage * perpage) >= song.totalnum) {
+      if (!song.list.length || (song.curnum + song.curpage * perpage) >= song.totalnum) {
         this.hasMore = false
       }
     },
@@ -107,16 +136,26 @@ export default {
         }
       })
       return ret
-    }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    }),
+    ...mapActions([
+      'insertSong'
+    ])
   },
   watch: {
     query(newquery) {
+      if (!newquery) {
+        return
+      }
       this.search(newquery)
     }
   },
   components: {
     Scroll,
-    Loading
+    Loading,
+    NoResult
   }
 }
 </script>
@@ -153,6 +192,20 @@ export default {
                 }
             }
         }
+    }
+    .no-result-wrapper {
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    .moveInLeft-enter-active,
+    .moveInLeft-leave-active {
+        transition: all 0.4s linear;
+    }
+    .moveInLeft-enter,
+    .moveInLeft-leave-to {
+        transform: translate3d(100%,0,0);
     }
 }
 </style>
