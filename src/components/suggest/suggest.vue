@@ -74,6 +74,9 @@ export default {
       }
       this.$emit('select', item)
     },
+    refresh() {
+      this.$refs.scroll.refresh()
+    },
     scrollToEnd() {
       if (!this.hasMore) {
         return

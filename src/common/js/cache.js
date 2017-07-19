@@ -50,3 +50,8 @@ export function deleteOne(query) {
   storage.set(SEARCH_KEY, searches)
   return searches
 }
+
+export function clearHistory() {
+  storage.clear()
+  return []
+}
