@@ -4,8 +4,8 @@
     <div class="list-wrapper" @click.stop>
       <div class="list-header">
         <h1 class="title">
-          <i class="icon"></i>
-          <span class="text"></span>
+          <i class="icon" :class="modeIcon" @click="changeMode"></i>
+          <span class="text">{{getModeText}}</span>
           <span class="clear" @click="showConfirm">
             <i class="icon-clear"></i>
           </span>
@@ -44,18 +44,20 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 import Scroll from '@/base/scroll/scroll'
 import { playMode } from '@/common/js/config'
 import Confirm from '@/base/confirm/confirm'
+import { playerMixin } from '@/common/js/mixin'
 
 export default {
+  mixins: [playerMixin],
   data() {
     return {
       showFlag: false
     }
   },
   computed: {
+    getModeText() {
+      return this.mode === playMode.random ? '随机播放' : this.mode === playMode.sequence ? '顺序播放' : '单曲循环'
+    },
     ...mapGetters([
-      'sequenceList',
-      'currentSong',
-      'mode',
       'playList'
     ])
   },
@@ -105,7 +107,6 @@ export default {
       this.$refs.listContent.scrollToElement(this.$refs.listContentItem[index], 300)
     },
     ...mapMutations({
-      setCurrentIndex: 'SET_CURRENTINDEX',
       setPlayingState: 'SET_PLAYING'
     }),
     ...mapActions([
@@ -166,21 +167,20 @@ export default {
                 display: flex;
                 align-items: center;
                 .icon {
-                  margin-right: 10px;
-                  font-size: 30px;
-                  color: $color-theme-d;
+                    margin-right: 10px;
+                    font-size: 30px;
+                    color: $color-theme-d;
                 }
                 .text {
-                  flex: 1;
-                  font-size: 14px;
-                  color: $color-text-l;
+                    flex: 1;
+                    font-size: 14px;
+                    color: $color-text-l;
                 }
                 .clear {
-                  @include extend-click()
-                  .icon-clear {
-                    font-size: 14px;
-                    color: $color-text-d;
-                  }
+                    @include extend-click() .icon-clear {
+                        font-size: 14px;
+                        color: $color-text-d;
+                    }
                 }
             }
         }
@@ -195,11 +195,11 @@ export default {
                 overflow: hidden;
                 &.list-content-fade-enter-active,
                 &.list-content-fade-leave-active {
-                  transition: all 0.1s
+                    transition: all 0.1s;
                 }
                 &.list-content-fade-enter,
                 &.list-content-fade-leave-to {
-                  height: 0;
+                    height: 0;
                 }
                 .current {
                     flex: 0 0 20px;
