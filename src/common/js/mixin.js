@@ -1,4 +1,4 @@
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { playMode } from '@/common/js/config'
 import { shuffle } from '@/common/js/util'
 
@@ -61,5 +61,28 @@ export const playerMixin = {
       setMode: 'SET_MODE',
       setPlayList: 'SET_PLAY_LIST'
     })
+  }
+}
+
+export const searchMixin = {
+  computed: {
+    ...mapGetters([
+      'searchHistory'
+    ])
+  },
+  methods: {
+    getQuery(query) {
+      this.query = query
+    },
+    save() {
+      this.saveSearchHistory(this.query)
+    },
+    blurInput() {
+      this.$refs.searchBox.blur()
+    },
+    ...mapActions([
+      'saveSearchHistory',
+      'deleteOneSearchHistory'
+    ])
   }
 }

@@ -28,6 +28,9 @@
       <suggest :query="query" @listScroll="blurInput" @select="save" ref="suggest"></suggest>
     </div>
     <confirm text="是否清空所有搜索历史" @confirm="clearSearchHistory" confirmBtnText="清空" ref="confirm"></confirm>
+    <transition name="moveInLeft">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
@@ -37,14 +40,14 @@ import { getHotKey } from '@/api/search'
 import { ERR_OK } from '@/api/config'
 import Suggest from '@/components/suggest/suggest'
 import SearchList from '@/base/search-list/search-list'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
 import Scroll from '@/base/scroll/scroll'
 import Confirm from '@/base/confirm/confirm'
-import { playListMixin } from '@/common/js/mixin'
+import { playListMixin, searchMixin } from '@/common/js/mixin'
 import { miniPlayerHeight } from '@/common/js/config'
 
 export default {
-  mixins: [playListMixin],
+  mixins: [playListMixin, searchMixin],
   data() {
     return {
       hotKeys: [],
@@ -54,10 +57,7 @@ export default {
   computed: {
     shortcutData() {
       return this.hotKeys.concat(this.searchHistory)
-    },
-    ...mapGetters([
-      'searchHistory'
-    ])
+    }
   },
   methods: {
     handlerPlayList(playlist) {
@@ -70,17 +70,8 @@ export default {
     showConfirm() {
       this.$refs.confirm.show()
     },
-    save() {
-      this.saveSearchHistory(this.query)
-    },
-    blurInput() {
-      this.$refs.searchBox.blur()
-    },
     setQuery(item) {
       this.$refs.searchBox.setQuery(item)
-    },
-    getQuery(query) {
-      this.query = query
     },
     _getHotKey() {
       getHotKey().then(res => {
@@ -90,8 +81,6 @@ export default {
       })
     },
     ...mapActions([
-      'saveSearchHistory',
-      'deleteOneSearchHistory',
       'clearSearchHistory'
     ])
   },
@@ -177,6 +166,14 @@ export default {
         top: 178px;
         bottom: 0;
         width: 100%;
+    }
+    .moveInLeft-enter-active,
+    .moveInLeft-leave-active {
+        transition: all 0.4s linear;
+    }
+    .moveInLeft-enter,
+    .moveInLeft-leave-to {
+        transform: translate3d(100%,0,0);
     }
 }
 </style>

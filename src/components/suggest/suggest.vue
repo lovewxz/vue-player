@@ -16,9 +16,6 @@
   <div class="no-result-wrapper">
     <no-result title="抱歉,无搜索结果" v-if="!hasMore && !searchResult.length"></no-result>
   </div>
-  <transition name="moveInLeft">
-    <router-view></router-view>
-  </transition>
 </div>
 </template>
 <script>
@@ -169,6 +166,7 @@ export default {
 .suggest {
     height: 100%;
     overflow: hidden;
+    z-index: 200;
     .suggest-list {
         padding: 0 30px;
         height: 100%;
@@ -201,14 +199,6 @@ export default {
         width: 100%;
         top: 50%;
         transform: translateY(-50%);
-    }
-    .moveInLeft-enter-active,
-    .moveInLeft-leave-active {
-        transition: all 0.4s linear;
-    }
-    .moveInLeft-enter,
-    .moveInLeft-leave-to {
-        transform: translate3d(100%,0,0);
     }
 }
 </style>
