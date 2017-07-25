@@ -70,9 +70,6 @@ export default {
     showConfirm() {
       this.$refs.confirm.show()
     },
-    setQuery(item) {
-      this.$refs.searchBox.setQuery(item)
-    },
     _getHotKey() {
       getHotKey().then(res => {
         if (res.code === ERR_OK) {

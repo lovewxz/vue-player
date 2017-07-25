@@ -71,6 +71,9 @@ export const searchMixin = {
     ])
   },
   methods: {
+    setQuery(item) {
+      this.$refs.searchBox.setQuery(item)
+    },
     getQuery(query) {
       this.query = query
     },

@@ -3,6 +3,9 @@ import storage from 'good-storage'
 const SEARCH_KEY = '__search__'
 const MAX_SEARCH_KEY_LEN = 15
 
+const PLAY_KEY = '__play__'
+const MAX_PLAY_KEY_LEN = 200
+
 /**
  * 使用storage库处理历史记录
  * @param  {Array} arr     [存储数组]
@@ -54,4 +57,17 @@ export function deleteOne(query) {
 export function clearHistory() {
   storage.clear()
   return []
+}
+
+export function setPlayHistory(song) {
+  let play = storage.get(PLAY_KEY, [])
+  _insert(play, song, (item) => {
+    return item.id === song.id
+  }, MAX_PLAY_KEY_LEN)
+  storage.set(PLAY_KEY, play)
+  return play
+}
+
+export function loadPlayHistory() {
+  return storage.get(PLAY_KEY, [])
 }
