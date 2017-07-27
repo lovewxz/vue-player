@@ -4,7 +4,7 @@
       <search-box ref="searchBox" @query="getQuery"></search-box>
     </div>
     <div class="shortcut-wrapper" v-show="!query" ref="shortcutWrapper">
-      <scroll class="shortcut" :data="shortcutData" ref="shortcut">
+      <scroll class="shortcut" :data="shortcutData" ref="shortcut" :delayRefresh="delayRefresh">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -50,8 +50,7 @@ export default {
   mixins: [playListMixin, searchMixin],
   data() {
     return {
-      hotKeys: [],
-      query: ''
+      hotKeys: []
     }
   },
   computed: {

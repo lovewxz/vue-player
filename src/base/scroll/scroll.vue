@@ -31,6 +31,10 @@ export default {
     beforeScroll: {
       type: Boolean,
       default: false
+    },
+    delayRefresh: {
+      type: Number,
+      default: 20
     }
   },
   methods: {
@@ -86,7 +90,7 @@ export default {
     data() {
       setTimeout(() => {
         this.refresh()
-      }, 20)
+      }, this.delayRefresh)
     }
   },
   mounted() {
@@ -94,7 +98,6 @@ export default {
       this._initScroll()
     }, 20)
   }
-
 }
 </script>
 

@@ -18,7 +18,7 @@
             <song-list :songs="playHistory" @selectItem="selectSong"></song-list>
           </div>
         </scroll>
-        <scroll class="list-scroll" v-if="currentIndex === 1" :data="searchHistory" ref="searchHistory">
+        <scroll class="list-scroll" v-if="currentIndex === 1" :data="searchHistory" ref="searchHistory" :delayRefresh="delayRefresh">
           <div class="list-inner">
             <search-list :searches="searchHistory" @deleteOne="deleteOneSearchHistory" @select="setQuery"></search-list>
           </div>
@@ -26,8 +26,14 @@
       </div>
     </div>
     <div class="search-result" v-show="query">
-      <suggest :query="query" :zhida="zhida" @listScroll="blurInput" @select="save"></suggest>
+      <suggest :query="query" :zhida="zhida" @listScroll="blurInput" @select="selectSuggest"></suggest>
     </div>
+    <top-tip ref="topTip">
+      <div class="tip-title">
+        <i class="icon-ok"></i>
+        <span class="text">1首歌曲已经添加到播放列表</span>
+      </div>
+    </top-tip>
   </div>
 </transition>
 </template>
@@ -41,13 +47,13 @@ import { searchMixin } from '@/common/js/mixin'
 import { mapGetters, mapActions } from 'vuex'
 import Scroll from '@/base/scroll/scroll'
 import SearchList from '@/base/search-list/search-list'
+import TopTip from '@/base/top-tip/top-tip'
 
 export default {
   mixins: [searchMixin],
   data() {
     return {
       showFlag: false,
-      query: '',
       zhida: false,
       switches: [{ name: '最近播放' }, { name: '搜索历史' }],
       currentIndex: 0
@@ -77,9 +83,14 @@ export default {
     seletSwitch(index) {
       this.currentIndex = index
     },
+    selectSuggest() {
+      this.save()
+      this.$refs.topTip.show()
+    },
     selectSong(item, index) {
       if (index !== 0) {
         this.insertSong(new Song(item))
+        this.$refs.topTip.show()
       }
     },
     ...mapActions([
@@ -92,7 +103,8 @@ export default {
     Switches,
     SongList,
     Scroll,
-    SearchList
+    SearchList,
+    TopTip
   }
 }
 </script>
@@ -158,6 +170,20 @@ export default {
         top: 124px;
         bottom: 0;
         width: 100%;
+    }
+    .top-tip {
+      text-align: center;
+      padding: 18px 0;
+      font-size: 0;
+      .icon-ok {
+        font-size: 14px;
+        color: $color-theme;
+        margin-right: 4px;
+      }
+      .text {
+        font-size: 14px;
+        color: #fff;
+      }
     }
 }
 </style>

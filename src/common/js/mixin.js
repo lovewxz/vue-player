@@ -65,6 +65,12 @@ export const playerMixin = {
 }
 
 export const searchMixin = {
+  data() {
+    return {
+      delayRefresh: 200,
+      query: ''
+    }
+  },
   computed: {
     ...mapGetters([
       'searchHistory'

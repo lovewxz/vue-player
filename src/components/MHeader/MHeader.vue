@@ -2,6 +2,9 @@
   <div class="head-top">
      <span class="head-icon"></span>
      <span class="head-text">Chicken Music</span>
+     <router-link to="/user" tag="div" class="mine">
+       <i class="icon-mine"></i>
+     </router-link>
   </div>
 </template>
 
@@ -11,12 +14,13 @@ export default {}
 
 <style lang="scss" scoped>
 @import '../../common/scss/mixin';
+@import '../../common/scss/variable';
 
 .head-top {
     position: relative;
     height: 44px;
     text-align: center;
-    color: #ffcd32;
+    color: $color-theme;
     font-size: 0;
     .head-icon {
         display: inline-block;
@@ -33,6 +37,17 @@ export default {}
         vertical-align: top;
         line-height: 44px;
         font-size: 18px;
+    }
+    .mine {
+      position: absolute;
+      top: 0;
+      right: 0;
+      .icon-mine {
+        display: block;
+        padding: 12px;
+        font-size: 20px;
+        color: $color-theme;
+      }
     }
 }
 </style>
