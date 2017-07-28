@@ -6,6 +6,9 @@ const MAX_SEARCH_KEY_LEN = 15
 const PLAY_KEY = '__play__'
 const MAX_PLAY_KEY_LEN = 200
 
+const FAVOURITE_KEY = '__favourite__'
+const MAX_FAVOURITE_KEY_LEN = 200
+
 /**
  * 使用storage库处理历史记录
  * @param  {Array} arr     [存储数组]
@@ -29,6 +32,13 @@ function _insert(arr, val, compare, maxlen) {
   }
 }
 
+function _delete(arr, compare) {
+  let index = arr.findIndex(compare)
+  if (index > -1) {
+    arr.splice(index, 1)
+  }
+}
+
 export function setStorage(query) {
   let searches = storage.get(SEARCH_KEY, [])
   _insert(searches, query, (item) => {
@@ -44,12 +54,9 @@ export function loadStorage() {
 
 export function deleteOne(query) {
   let searches = storage.get(SEARCH_KEY, [])
-  let index = searches.findIndex((item) => {
+  _delete(searches, (item) => {
     return item === query
   })
-  if (index > -1) {
-    searches.splice(index, 1)
-  }
   storage.set(SEARCH_KEY, searches)
   return searches
 }
@@ -70,4 +77,26 @@ export function setPlayHistory(song) {
 
 export function loadPlayHistory() {
   return storage.get(PLAY_KEY, [])
+}
+
+export function setFavouriteList(song) {
+  let list = storage.get(FAVOURITE_KEY, [])
+  _insert(list, song, (item) => {
+    return item.id === song.id
+  }, MAX_FAVOURITE_KEY_LEN)
+  storage.set(FAVOURITE_KEY, list)
+  return list
+}
+
+export function loadFavouriteList() {
+  return storage.get(FAVOURITE_KEY, [])
+}
+
+export function cancelFavouriteList(song) {
+  let list = storage.get(FAVOURITE_KEY, [])
+  _delete(list, (item) => {
+    return item.id === song.id
+  })
+  storage.set(FAVOURITE_KEY, list)
+  return list
 }

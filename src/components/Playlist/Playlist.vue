@@ -16,8 +16,8 @@
           <li :key="item.id" class="item" v-for="(item,index) in sequenceList" @click="selectItem(item,index)" ref="listContentItem">
             <i class="current" :class="getCurrentIconCls(item)"></i>
             <span class="text" v-html="item.name"></span>
-            <span class="like">
-              <i class="icon-not-favourite"></i>
+            <span class="like" @click="toggleFavourite(item)">
+              <i :class="getFavouriteIcon(item)"></i>
             </span>
             <span class="delete" @click.stop="deleteOne(item)">
               <i class="icon-delete"></i>
@@ -225,6 +225,9 @@ export default {
                     margin-right: 15px;
                     font-size: 12px;
                     color: $color-theme;
+                    .icon-favorite {
+                      color: $color-sub-theme;
+                    }
                 }
                 .delete {
                     position: relative;

@@ -23,3 +23,5 @@ export const rankdetail = state => state.rankdetail
 export const searchHistory = state => state.searchHistory
 
 export const playHistory = state => state.playHistory
+
+export const favouriteList = state => state.favouriteList

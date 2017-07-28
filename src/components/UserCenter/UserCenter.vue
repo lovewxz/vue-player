@@ -11,12 +11,27 @@
       <i class="icon-play"></i>
       <span class="text">随机播放全部</span>
     </div>
-    <div class="list-wrapper"></div>
+    <div class="list-wrapper">
+      <scroll class="list-scroll" v-if="currentIndex === 0" :data="favouriteList" ref="favouriteList">
+        <div class="list-inner">
+          <song-list :songs="favouriteList" @selectItem="selectSong"></song-list>
+        </div>
+      </scroll>
+      <scroll class="list-scroll" v-if="currentIndex === 1" :data="playHistory" ref="playHistory">
+        <div class="list-inner">
+          <song-list :songs="playHistory" @selectItem="selectSong"></song-list>
+        </div>
+      </scroll>
+    </div>
   </div>
 </transition>
 </template>
 <script>
 import Switches from '@/base/switches/switches'
+import Scroll from '@/base/scroll/scroll'
+import SongList from '@/base/song-list/song-list'
+import Song from '@/common/js/song'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   data() {
@@ -25,16 +40,30 @@ export default {
       currentIndex: 0
     }
   },
+  computed: {
+    ...mapGetters([
+      'favouriteList',
+      'playHistory'
+    ])
+  },
   methods: {
     back() {
       this.$router.back()
     },
     selectCurrentIndex(index) {
       this.currentIndex = index
-    }
+    },
+    selectSong(song) {
+      this.insertSong(new Song(song))
+    },
+    ...mapActions([
+      'insertSong'
+    ])
   },
   components: {
-    Switches
+    Switches,
+    Scroll,
+    SongList
   }
 }
 </script>
@@ -98,6 +127,13 @@ export default {
         top: 110px;
         bottom: 0;
         width: 100%;
+        .list-scroll {
+          height: 100%;
+          overflow: hidden;
+          .list-inner {
+            padding: 20px 30px;
+          }
+        }
     }
 }
 </style>

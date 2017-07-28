@@ -57,7 +57,7 @@
             <i class="icon-next" @click="next"></i>
           </div>
           <div class="icon i-right">
-            <i class="icon-favorite"></i>
+            <i class="icon" :class="getFavouriteIcon(currentSong)" @click="toggleFavourite(currentSong)"></i>
           </div>
         </div>
       </div>
@@ -641,7 +641,7 @@ export default {
                     text-align: left;
                 }
                 .icon-favorite {
-                    color: $color-theme;
+                    color: $color-sub-theme;
                 }
             }
         }
