@@ -83,7 +83,7 @@
     </div>
   </transition>
   <playlist ref="playlist"></playlist>
-  <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="getAudioTime" @ended="end"></audio>
+  <audio :src="currentSong.url" ref="audio" @play="ready" @error="error" @timeupdate="getAudioTime" @ended="end"></audio>
 </div>
 </template>
 <script>
@@ -206,6 +206,7 @@ export default {
     end() {
       if (this.mode === playMode.loop) {
         this._loop()
+        return
       } else {
         this.next()
       }
@@ -216,6 +217,7 @@ export default {
       }
       if (this.playList.length === 1) {
         this._loop()
+        return
       } else {
         let index = this.currentIndex - 1
         if (index === -1) {
@@ -234,6 +236,7 @@ export default {
       }
       if (this.playList.length === 1) {
         this._loop()
+        return
       } else {
         let index = this.currentIndex + 1
         if (index === this.playList.length) {
@@ -353,8 +356,10 @@ export default {
     },
     _getLyric() {
       this.currentSong.getLyric().then(res => {
+        if (this.currentSong.lyric !== res) {
+          return
+        }
         this.currentLyric = new Lyric(res, this._handlerLyric)
-        console.log(this.currentLyric)
         if (this.playing) {
           this.currentLyric.play()
         }
@@ -398,7 +403,8 @@ export default {
         this.currentLyric.stop()
       }
       // 为了兼容微信切换到后台时，返回后继续能播放
-      setTimeout(() => {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
         this.$refs.audio.play()
         this._getLyric()
       }, 1000)
