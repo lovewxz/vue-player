@@ -28,6 +28,9 @@
             <div v-if="currentLyric">
               <p class="text" v-for="(line,index) in currentLyric.lines" ref="lyricline" :class="{current: currentLineNum === index}">{{line.txt}}</p>
             </div>
+            <div class="pure-music" v-show="isPureMusic">
+              <p>{{pureMusicLyric}}</p>
+            </div>
           </div>
         </scroll>
       </div>
@@ -83,7 +86,7 @@
     </div>
   </transition>
   <playlist ref="playlist"></playlist>
-  <audio :src="currentSong.url" ref="audio" @play="ready" @error="error" @timeupdate="getAudioTime" @ended="end"></audio>
+  <audio :src="currentSong.url" ref="audio" @play="ready" @error="error" @timeupdate="getAudioTime" @ended="end" @pause="paused"></audio>
 </div>
 </template>
 <script>
@@ -101,6 +104,8 @@ import { playerMixin } from '@/common/js/mixin'
 const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transitionDuration')
 
+const timeExp = /\[(\d{2}):(\d{2}):(\d{2})]/g
+
 export default {
   mixins: [playerMixin],
   data() {
@@ -111,7 +116,9 @@ export default {
       currentLyric: null,
       currentShow: 'cd',
       currentLineNum: 0,
-      playingLyric: ''
+      playingLyric: '',
+      isPureMusic: false,
+      pureMusicLyric: ''
     }
   },
   computed: {
@@ -143,7 +150,7 @@ export default {
     },
     progressOnChange(percent) {
       const currentTime = this.currentSong.duration * percent
-      this.$refs.audio.currentTime = currentTime
+      this.currentTime = this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
         this.togglePlaying()
       }
@@ -204,6 +211,7 @@ export default {
       }
     },
     end() {
+      this.currentTime = 0
       if (this.mode === playMode.loop) {
         this._loop()
         return
@@ -252,6 +260,16 @@ export default {
     ready() {
       this.songReady = true
       this.savePlayHistory(this.currentSong)
+      // 如果歌曲的播放晚于歌词的出现，播放的时候需要同步歌词
+      if (this.currentLyric && !this.isPureMusic) {
+        this.currentLyric.seek(this.currentTime * 1000)
+      }
+    },
+    paused() {
+      this.setPlaying(false)
+      if (this.currentLyric) {
+        this.currentLyric.stop()
+      }
     },
     error() {
       this.songReady = true
@@ -360,8 +378,15 @@ export default {
           return
         }
         this.currentLyric = new Lyric(res, this._handlerLyric)
-        if (this.playing) {
-          this.currentLyric.play()
+        this.isPureMusic = !this.currentLyric.lines.length
+        if (this.isPureMusic) {
+          this.pureMusicLyric = this.currentLyric.lrc.replace(timeExp, '').trim()
+          this.playingLyric = this.pureMusicLyric
+        } else {
+          if (this.playing && this.songReady) {
+            // 这个时候有可能用户已经播放了歌曲，要切到对应位置
+            this.currentLyric.seek(this.currentTime * 1000)
+          }
         }
       }).catch(() => {
         this.currentLyric = null
@@ -370,6 +395,9 @@ export default {
       })
     },
     _handlerLyric({ lineNum, txt }) {
+      if (!this.$refs.lyricline) {
+        return
+      }
       this.currentLineNum = lineNum
       if (lineNum > 5) {
         let lineEl = this.$refs.lyricline[lineNum - 5]
@@ -573,6 +601,12 @@ export default {
                         &.current {
                             color: $color-text-ll;
                         }
+                    }
+                    .pure-music {
+                        padding-top: 50%;
+                        line-height: 32px;
+                        color: $color-text-l;
+                        font-size: $font-size-medium;
                     }
                 }
             }

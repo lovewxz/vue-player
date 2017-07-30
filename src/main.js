@@ -13,6 +13,8 @@ Vue.use(VueLazyLoad, {
 })
 
 fastclick.attach(document.body)
+/* eslint-disable no-unused-vars */
+import vConsole from 'vconsole'
 
 /* eslint-disable no-new */
 new Vue({
